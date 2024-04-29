@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Damage Belt Identification</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        font-size: 30px;
+        margin-top: 200px;
+        background-color: rgb(76, 216, 108);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #uploadForm {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #imagePreview {
+        text-align: center;
+        margin-top: 20px;
+      }
+      #prediction {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="font-size: 50px;">Damage Belt Identification</h1>
+    <form id="uploadForm" action="/predict" method="post">
+      <input type="file" name="file" id="fileInput" accept="image/*" />
+      <button type="submit">Predict</button>
+    </form>
+    <div id="prediction"></div>
+    <div id="imagePreview"></div>
+
+    <script>
+      const form = document.getElementById("uploadForm");
+      const predictionDiv = document.getElementById("prediction");
+      const imagePreviewDiv = document.getElementById("imagePreview");
+      const fileInput = document.getElementById("fileInput");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const response = await fetch("/predict", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+        predictionDiv.textContent = `Predicted Belt Type: ${result.prediction}`;
+
+        // Display uploaded image
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const imgElement = document.createElement("img");
+          imgElement.src = event.target.result;
+          imagePreviewDiv.innerHTML = "";
+          imagePreviewDiv.appendChild(imgElement);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      });
+    </script>
+  
+  </body>
+</html>
